@@ -19,7 +19,6 @@ namespace StAutomationProject.Utilities
                 var basePath = Directory.GetCurrentDirectory();
                 var configPath = Path.Combine(basePath, "Configurations", "appsettings.json");
 
-                // Debug: In ra đường dẫn để kiểm tra
                 Console.WriteLine($"Config base path: {basePath}");
                 Console.WriteLine($"Config file path: {configPath}");
                 Console.WriteLine($"Config file exists: {File.Exists(configPath)}");
@@ -65,14 +64,14 @@ namespace StAutomationProject.Utilities
                 if (string.IsNullOrEmpty(browser))
                 {
                     Console.WriteLine("Browser not found in config, using default");
-                    return "Chrome"; // Default value
+                    return "Chrome";
                 }
                 return browser;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting Browser: {ex.Message}");
-                return "Chrome"; // Default value
+                return "Chrome"; 
             }
         }
 
@@ -84,7 +83,7 @@ namespace StAutomationProject.Utilities
                 if (string.IsNullOrEmpty(timeoutString))
                 {
                     Console.WriteLine("Timeout not found in config, using default");
-                    return 30; // Default value
+                    return 30; 
                 }
 
                 if (int.TryParse(timeoutString, out int timeout))
@@ -94,17 +93,16 @@ namespace StAutomationProject.Utilities
                 else
                 {
                     Console.WriteLine($"Invalid timeout value: {timeoutString}, using default");
-                    return 30; // Default value
+                    return 30; 
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting Timeout: {ex.Message}");
-                return 30; // Default value
+                return 30; 
             }
         }
 
-        // Helper method để debug configuration
         public static void DebugConfiguration()
         {
             Console.WriteLine("=== Configuration Debug ===");
