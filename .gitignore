@@ -13,7 +13,6 @@ TestResults/
 # Ignore Visual Studio cache
 .vs/
 
-# Ignore ExtentReports folder if auto-generated
 
 # Ignore WebDriver binaries (nếu không cần commit)
 Drivers/
