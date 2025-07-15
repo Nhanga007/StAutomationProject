@@ -1,1 +1,2 @@
 bin/ obj/ Drivers/ Reports/ *.csproj.user
+.vs/
