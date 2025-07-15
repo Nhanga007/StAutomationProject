@@ -1,2 +1,36 @@
-bin/ obj/ Drivers/ Reports/ *.csproj.user
+﻿# Ignore build output
+bin/
+obj/
+TestResults/
+*.log
+
+# Ignore user-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore Visual Studio cache
 .vs/
+
+# Ignore ExtentReports folder if auto-generated
+Reports/
+
+# Ignore WebDriver binaries (nếu không cần commit)
+Drivers/
+
+# Ignore JetBrains Rider settings
+.idea/
+
+# Ignore temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Ignore screenshots (optional)
+Screenshots/
+*.png
+
+# Ignore environment config (if sensitive or local)
+.env
