@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
+using SeleniumExtras.WaitHelpers;
 
 namespace PageObjects
 {
@@ -23,5 +24,21 @@ namespace PageObjects
         {
             return Wait.Until(drv => drv.FindElement(by));
         }
+        protected void CloseAdsIfPresent()
+        {
+            try
+            {
+                var ad = Driver.FindElement(By.CssSelector(".ad_position_box"));
+                if (ad.Displayed)
+                {
+                    var closeBtn = ad.FindElement(By.CssSelector(".close"));
+                    closeBtn.Click();
+                    Wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.CssSelector(".ad_position_box")));
+                }
+            }
+            catch { /* ignore nếu không có quảng cáo */ }
+        }
+
+
     }
 }

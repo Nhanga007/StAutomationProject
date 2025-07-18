@@ -19,6 +19,19 @@ namespace StAutomationProject.Utilities
                 case "chrome":
                     new DriverManager().SetUpDriver(new ChromeConfig());
                     var chromeOptions = new ChromeOptions();
+                    // Tắt thông báo đẩy
+                    chromeOptions.AddArgument("--disable-notifications");
+                    // Tắt gợi ý lưu mật khẩu và tự động điền
+                    chromeOptions.AddUserProfilePreference("credentials_enable_service", false);
+                    chromeOptions.AddUserProfilePreference("profile.password_manager_enabled", false);
+                    // Tắt các popup và gợi ý khác
+                    chromeOptions.AddArgument("--disable-popup-blocking");
+                    chromeOptions.AddArgument("--disable-infobars");
+                    chromeOptions.AddArgument("--disable-extensions");
+                    // Tắt lưu địa chỉ
+                    chromeOptions.AddUserProfilePreference("autofill.profile_enabled", false);
+                    chromeOptions.AddUserProfilePreference("autofill.credit_card_enabled", false);
+                    // Tắt dấu hiệu automation
                     chromeOptions.AddArgument("--disable-blink-features=AutomationControlled");
                     chromeOptions.AddExcludedArgument("enable-automation");
                     chromeOptions.AddAdditionalOption("useAutomationExtension", false);
@@ -41,9 +54,9 @@ namespace StAutomationProject.Utilities
                     throw new ArgumentException($"Browser '{browserName}' is not supported.");
             }
 
-            // Common settings
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
             driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(30);
+            driver.Manage().Window.Maximize(); 
 
             return driver;
         }

@@ -11,6 +11,7 @@ namespace Utilities
     {
         private static ExtentReports _extent;
         private static ExtentTest _test;
+        private static string _reportPath; 
 
         public static void InitReport()
         {
@@ -19,12 +20,17 @@ namespace Utilities
             if (!Directory.Exists(reportsDir))
                 Directory.CreateDirectory(reportsDir);
 
-            var reportPath = Path.Combine(reportsDir, $"TestReport_{DateTime.Now:yyyyMMdd_HHmmss}.html");
+            var fileName = $"TestReport_{DateTime.Now:yyyyMMdd_HHmmss}.html";
+            _reportPath = Path.Combine(reportsDir, fileName);
 
-            var htmlReporter = new ExtentHtmlReporter(reportPath);
+            var htmlReporter = new ExtentHtmlReporter(_reportPath);
+
+            htmlReporter.Config.DocumentTitle = "Test Automation Report";
+            htmlReporter.Config.ReportName = "Test Results";
+            htmlReporter.Config.Theme = AventStack.ExtentReports.Reporter.Configuration.Theme.Standard;
+
             _extent = new ExtentReports();
             _extent.AttachReporter(htmlReporter);
-
             _extent.AddSystemInfo("Environment", "QA");
             _extent.AddSystemInfo("Browser", ConfigReader.GetBrowser());
             _extent.AddSystemInfo("URL", ConfigReader.GetBaseUrl());
@@ -56,6 +62,25 @@ namespace Utilities
         public static void FlushReport()
         {
             _extent.Flush();
+            RenameReportFile();
+        }
+
+        private static void RenameReportFile()
+        {
+            try
+            {
+                var directory = Path.GetDirectoryName(_reportPath);
+                var indexPath = Path.Combine(directory, "index.html");
+
+                if (File.Exists(indexPath) && !File.Exists(_reportPath))
+                {
+                    File.Move(indexPath, _reportPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error renaming report file: {ex.Message}");
+            }
         }
 
         private static string CaptureScreenshot(IWebDriver driver, string testName)
