@@ -22,6 +22,17 @@ namespace StAutomationProject.Tests
             ExtentReport.InitReport();
             Console.WriteLine("ExtentReports initialized.");
         }
+        [OneTimeSetUp]
+        public static void OneTimeSetUp()
+        {
+            ExtentReport.Init();
+        }
+
+        [OneTimeTearDown]
+        public static void OneTimeTearDown()
+        {
+            ExtentReport.Cleanup();
+        }
 
         [SetUp]
         public void Setup()

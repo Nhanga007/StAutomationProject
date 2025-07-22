@@ -90,5 +90,20 @@ namespace Utilities
             screenshot.SaveAsFile(screenshotPath);
             return screenshotPath;
         }
+
+        public static ExtentReports Instance { get; private set; }
+
+        public static void Init()
+        {
+            var reportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports", "ExtentReport.html");
+            var htmlReporter = new ExtentHtmlReporter(reportPath);
+            Instance = new ExtentReports();
+            Instance.AttachReporter(htmlReporter);
+        }
+
+        public static void Cleanup()
+        {
+            Instance?.Flush();
+        }
     }
 }
