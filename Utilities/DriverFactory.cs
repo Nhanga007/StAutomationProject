@@ -5,6 +5,7 @@ using OpenQA.Selenium.Edge;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
 using System;
+using OpenQA.Selenium.Remote;
 
 namespace StAutomationProject.Utilities
 {
@@ -35,6 +36,10 @@ namespace StAutomationProject.Utilities
                     chromeOptions.AddArgument("--disable-blink-features=AutomationControlled");
                     chromeOptions.AddExcludedArgument("enable-automation");
                     chromeOptions.AddAdditionalOption("useAutomationExtension", false);
+                    chromeOptions.AddArgument("--headless"); // Chạy không giao diện (tốt cho CI)
+                    chromeOptions.AddArgument("--no-sandbox"); // Cần cho Docker
+                    chromeOptions.AddArgument("--disable-dev-shm-usage"); // Tối ưu hóa bộ nhớ trong container
+                    driver = new RemoteWebDriver(new Uri(seleniumHubUrl), chromeOptions);
                     driver = new ChromeDriver(chromeOptions);
                     break;
 
