@@ -14,19 +14,29 @@ pipeline {
             }
         }
         stage('Test') {
-            steps {
-                script {
-                    bat 'docker run -d -p 4444:4444 --name selenium-chrome selenium/standalone-chrome'
-                    bat 'dotnet test --logger "junit;LogFilePath=test-results.xml" --filter TestCategory!=Ignore'
-                }
-            }
-            post {
-                always {
-                    junit '**/test-results.xml'
-                    bat 'docker stop selenium-chrome && docker rm selenium-chrome'
-                }
-            }
+    steps {
+        script {
+            // Stop & remove container nếu đang chạy
+            sh '''
+                if [ $(docker ps -aq -f name=selenium-chrome) ]; then
+                    docker rm -f selenium-chrome || true
+                fi
+            '''
+
+            // Khởi chạy lại container mới
+            sh 'docker run -d -p 4444:4444 --name selenium-chrome selenium/standalone-chrome'
+
+            // Chạy test
+            sh 'dotnet test --logger "junit;LogFilePath=test-results.xml"'
         }
+    }
+    post {
+        always {
+            junit '**/test-results.xml'
+        }
+    }
+}
+
     }
     post {
         success {
