@@ -9,6 +9,7 @@ using NUnit.Framework;
 namespace StAutomationProject.Tests.TestCases
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.Self)]
     public class RegisterTests : TestBase
     {
         private RegisterPage _registerPage;

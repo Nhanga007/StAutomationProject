@@ -5,6 +5,7 @@ using StAutomationProject.PageObjects.Pages;
 namespace StAutomationProject.Tests.TestCases
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.Self)]
     public class LoginTests : TestBase
     {
         private LoginPage _loginPage;

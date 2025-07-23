@@ -10,7 +10,7 @@ using Utilities;
 
 namespace StAutomationProject.Tests
 {
-    public class TestBase
+    public abstract class TestBase
     {
         protected IWebDriver Driver;
         protected ExtentTest Test;
