@@ -38,7 +38,6 @@ namespace StAutomationProject.Utilities
                     chromeOptions.AddArgument("--disable-dev-shm-usage"); 
                     driver = new RemoteWebDriver(new Uri(seleniumHubUrl), chromeOptions);
                     break;
-
                 case "firefox":
                     new DriverManager().SetUpDriver(new FirefoxConfig());
                     var firefoxOptions = new FirefoxOptions();
@@ -50,7 +49,6 @@ namespace StAutomationProject.Utilities
                     var edgeOptions = new EdgeOptions();
                     driver = new RemoteWebDriver(new Uri(seleniumHubUrl), edgeOptions); 
                     break;
-
                 default:
                     throw new ArgumentException($"Browser '{browserName}' is not supported.");
             }
