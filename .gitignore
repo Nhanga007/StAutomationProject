@@ -33,3 +33,4 @@ Screenshots/
 # Ignore environment config (if sensitive or local)
 .env
 *.csproj.user
+Reports/

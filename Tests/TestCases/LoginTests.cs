@@ -4,11 +4,16 @@ using StAutomationProject.PageObjects.Pages;
 
 namespace StAutomationProject.Tests.TestCases
 {
-    [TestFixture]
-    [Parallelizable(ParallelScope.Self)]
+    [TestFixture("Chrome")]
+    [TestFixture("Edge")]
+    [Parallelizable(ParallelScope.Fixtures)]
     public class LoginTests : TestBase
     {
         private LoginPage _loginPage;
+
+        public LoginTests(string browser) : base(browser)
+        {
+        }
 
         [SetUp]
         public void TestSetup()

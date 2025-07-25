@@ -1,18 +1,17 @@
-﻿using StAutomationProject.PageObjects.Pages;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AventStack.ExtentReports;
 using NUnit.Framework;
+using StAutomationProject.PageObjects.Pages;
 
 namespace StAutomationProject.Tests.TestCases
 {
-    [TestFixture]
-    [Parallelizable(ParallelScope.Self)]
+    [TestFixture("Chrome")]
+    [TestFixture("Edge")]
+    [Parallelizable(ParallelScope.Fixtures)]
     public class RegisterTests : TestBase
     {
         private RegisterPage _registerPage;
+
+        public RegisterTests(string browser) : base(browser) { }
 
         [SetUp]
         public void TestSetup()
@@ -25,10 +24,10 @@ namespace StAutomationProject.Tests.TestCases
         public void Register_WithValidDetails_ShouldRegisterSuccessfully()
         {
             string email = $"test{DateTime.Now.Ticks}@gmail.com";
-            _registerPage.EnterRegistrationDetails("Nguyen", "XuanNhan", $"test{DateTime.Now.Ticks}@example.com", "Password123", "Password123");
+            _registerPage.EnterRegistrationDetails("Nguyen", "XuanNhan", email, "Password123", "Password123");
             _registerPage.ClickCreateAccount();
             Assert.That(Driver.Url.Contains("customer/account"), "Registration failed: Not redirected to account page");
-            Test.Log(AventStack.ExtentReports.Status.Info,$"Register with email:  + {email}");
+            Test.Log(Status.Info, $"Register with email: {email}");
         }
 
         [Test]
@@ -36,8 +35,8 @@ namespace StAutomationProject.Tests.TestCases
         {
             _registerPage.EnterRegistrationDetails("Nguyen", "XuanNhan", "test@example.com", "Password123", "DifferentPassword");
             _registerPage.ClickCreateAccount();
-            Assert.That(_registerPage.IsErrorMessageDisplayed(), "Please enter the same value again.");
-            Test.Log(AventStack.ExtentReports.Status.Info, "Error message displayed: " + _registerPage.GetErrorMessage());
+            Assert.That(_registerPage.IsErrorMessageDisplayed(), "Error message not displayed for mismatched passwords.");
+            Test.Log(Status.Info, "Error message displayed: " + _registerPage.GetErrorMessage());
         }
     }
 }

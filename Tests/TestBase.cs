@@ -1,12 +1,7 @@
 ﻿using AventStack.ExtentReports;
 using OpenQA.Selenium;
 using StAutomationProject.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Utilities;
+using NUnit.Framework;
 
 namespace StAutomationProject.Tests
 {
@@ -14,41 +9,54 @@ namespace StAutomationProject.Tests
     {
         protected IWebDriver Driver;
         protected ExtentTest Test;
+        private readonly string _browser;
+
+        protected TestBase(string browser)
+        {
+            _browser = browser;
+        }
 
         [OneTimeSetUp]
-        public void GlobalSetup()
+        public static void OneTimeSetUp()
         {
             Console.WriteLine("Initializing ExtentReports...");
             ExtentReport.InitReport();
             Console.WriteLine("ExtentReports initialized.");
         }
-        [OneTimeSetUp]
-        public static void OneTimeSetUp()
-        {
-            ExtentReport.Init();
-        }
 
         [OneTimeTearDown]
         public static void OneTimeTearDown()
         {
-            ExtentReport.Cleanup();
+            Console.WriteLine("Flushing ExtentReports...");
+            ExtentReport.FlushReport();
+            Console.WriteLine("ExtentReports flushed.");
         }
 
         [SetUp]
         public void Setup()
         {
-            Driver = DriverFactory.InitDriver("Chrome");
-            Driver.Manage().Window.Maximize();
-            Test = ExtentReport.CreateTest(TestContext.CurrentContext.Test.Name);
+            Driver = DriverFactory.InitDriver(_browser);
+            Driver.Navigate().GoToUrl(ConfigReader.GetBaseUrl());
+            Test = ExtentReport.CreateTest($"{TestContext.CurrentContext.Test.Name} ({_browser})");
+        }
+        [OneTimeSetUp]
+        public void GlobalSetup()
+        {
+            ExtentReport.InitReport(); // ← bạn cần có dòng gọi này
         }
 
+        [OneTimeTearDown]
+        public void GlobalTeardown()
+        {
+            ExtentReport.FlushReport(); // ← nếu thiếu dòng này thì sẽ không có file report
+        }
         [TearDown]
         public void TearDown()
         {
             try
             {
                 Console.WriteLine("Logging test result...");
-                ExtentReport.LogTestResult(TestContext.CurrentContext, Driver);
+                ExtentReport.LogTestResult(Test, TestContext.CurrentContext, Driver);
                 Driver?.Quit();
                 Console.WriteLine("Test completed.");
             }
@@ -57,14 +65,6 @@ namespace StAutomationProject.Tests
                 Driver?.Dispose();
                 Driver = null;
             }
-        }
-
-        [OneTimeTearDown]
-        public void GlobalTearDown()
-        {
-            Console.WriteLine("Flushing ExtentReports...");
-            ExtentReport.FlushReport();
-            Console.WriteLine("ExtentReports flushed.");
         }
     }
 }

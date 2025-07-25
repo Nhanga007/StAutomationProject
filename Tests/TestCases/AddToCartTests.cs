@@ -6,13 +6,18 @@ using StAutomationProject.PageObjects.Pages;
 
 namespace StAutomationProject.Tests.TestCases
 {
-    [TestFixture]
-    [Parallelizable(ParallelScope.Self)]
+    [TestFixture("Chrome")]
+    [TestFixture("Edge")]
+    [Parallelizable(ParallelScope.Fixtures)]
     public class AddToCartTests : TestBase
     {
         private LoginPage _loginPage;
         private HomePage _homePage;
         private ProductPage _productPage;
+
+        public AddToCartTests(string browser) : base(browser)
+        {
+        }
 
         [SetUp]
         public void TestSetup()

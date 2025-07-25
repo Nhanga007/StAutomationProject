@@ -5,13 +5,12 @@ using StAutomationProject.Utilities;
 using System;
 using System.IO;
 
-namespace Utilities
+namespace StAutomationProject.Utilities
 {
     public static class ExtentReport
     {
         private static ExtentReports _extent;
-        private static ExtentTest _test;
-        private static string _reportPath; 
+        private static string _reportPath;
 
         public static void InitReport()
         {
@@ -32,30 +31,28 @@ namespace Utilities
             _extent = new ExtentReports();
             _extent.AttachReporter(htmlReporter);
             _extent.AddSystemInfo("Environment", "QA");
-            _extent.AddSystemInfo("Browser", ConfigReader.GetBrowser());
             _extent.AddSystemInfo("URL", ConfigReader.GetBaseUrl());
         }
 
         public static ExtentTest CreateTest(string testName, string description = "")
         {
-            _test = _extent.CreateTest(testName, description);
-            return _test;
+            return _extent.CreateTest(testName, description);
         }
 
-        public static void LogTestResult(TestContext context, IWebDriver driver = null)
+        public static void LogTestResult(ExtentTest test, TestContext context, IWebDriver driver = null)
         {
             if (context.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed)
             {
-                _test.Fail(context.Result.Message);
+                test.Fail(context.Result.Message);
                 if (driver != null)
                 {
                     var screenshotPath = CaptureScreenshot(driver, context.Test.Name);
-                    _test.AddScreenCaptureFromPath(screenshotPath);
+                    test.AddScreenCaptureFromPath(screenshotPath);
                 }
             }
             else if (context.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Passed)
             {
-                _test.Pass("Test passed");
+                test.Pass("Test passed");
             }
         }
 
@@ -89,21 +86,6 @@ namespace Utilities
             var screenshotPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports", $"{testName}_{DateTime.Now:yyyyMMdd_HHmmss}.png");
             screenshot.SaveAsFile(screenshotPath);
             return screenshotPath;
-        }
-
-        public static ExtentReports Instance { get; private set; }
-
-        public static void Init()
-        {
-            var reportPath = Path.Combine(Directory.GetCurrentDirectory(), "Reports", "ExtentReport.html");
-            var htmlReporter = new ExtentHtmlReporter(reportPath);
-            Instance = new ExtentReports();
-            Instance.AttachReporter(htmlReporter);
-        }
-
-        public static void Cleanup()
-        {
-            Instance?.Flush();
         }
     }
 }
