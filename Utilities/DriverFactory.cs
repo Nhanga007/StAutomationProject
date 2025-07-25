@@ -1,7 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
-using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Remote;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
@@ -11,68 +10,148 @@ namespace StAutomationProject.Utilities
 {
     public static class DriverFactory
     {
-        private static readonly string seleniumHubUrl = "http://localhost:4444/wd/hub";
+        private static readonly string UBlockExtensionChromePath = @"D:\uBlock\uBlockChrome";
+        private static readonly string UBlockExtensionEdgePath = @"D:\uBlock\uBlockEdge";
+        private static readonly string SeleniumHubUrl = "http://localhost:4444/wd/hub"; 
 
-        public static IWebDriver InitDriver(string browserName)
+        public static IWebDriver InitDriver(string browserName, bool useSeleniumHub = false)
         {
             IWebDriver driver;
 
-            bool isRunningInJenkins = Environment.GetEnvironmentVariable("JENKINS_HOME") != null;
-
-            switch (browserName.ToLower())
+            if (useSeleniumHub)
             {
-                case "chrome":
-                    new DriverManager().SetUpDriver(new ChromeConfig());
-                    var chromeOptions = new ChromeOptions();
-                    chromeOptions.AddArgument("--disable-notifications");
-                    chromeOptions.AddUserProfilePreference("credentials_enable_service", false);
-                    chromeOptions.AddUserProfilePreference("profile.password_manager_enabled", false);
-                    chromeOptions.AddArgument("--disable-popup-blocking");
-                    chromeOptions.AddArgument("--disable-infobars");
-                    chromeOptions.AddUserProfilePreference("autofill.profile_enabled", false);
-                    chromeOptions.AddUserProfilePreference("autofill.credit_card_enabled", false);
-                    chromeOptions.AddArgument("--disable-blink-features=AutomationControlled");
-                    chromeOptions.AddExcludedArgument("enable-automation");
-                    chromeOptions.AddAdditionalOption("useAutomationExtension", false);
+                switch (browserName.ToLower())
+                {
+                    case "chrome":
+                        try
+                        {
+                            Console.WriteLine("Setting up RemoteWebDriver for Chrome...");
+                            var chromeOptions = new ChromeOptions();
+                            chromeOptions.AddArgument("--disable-notifications");
+                            chromeOptions.AddUserProfilePreference("credentials_enable_service", false);
+                            chromeOptions.AddUserProfilePreference("profile.password_manager_enabled", false);
+                            chromeOptions.AddArgument("--disable-popup-blocking");
+                            chromeOptions.AddArgument("--disable-infobars");
+                            chromeOptions.AddArgument("--disable-extensions");
+                            chromeOptions.AddUserProfilePreference("autofill.profile_enabled", false);
+                            chromeOptions.AddUserProfilePreference("autofill.credit_card_enabled", false);
+                            chromeOptions.AddArgument("--disable-blink-features=AutomationControlled");
+                            chromeOptions.AddExcludedArgument("enable-automation");
+                            chromeOptions.AddAdditionalOption("useAutomationExtension", false);
+                            chromeOptions.AddArgument("--headless");
+                            chromeOptions.AddArgument("--no-sandbox");
+                            chromeOptions.AddArgument("--disable-dev-shm-usage");
 
-                    if (isRunningInJenkins)
-                    {
-                        chromeOptions.AddArgument("--headless");
-                        chromeOptions.AddArgument("--no-sandbox");
-                        chromeOptions.AddArgument("--disable-dev-shm-usage");
-                        driver = new RemoteWebDriver(new Uri(seleniumHubUrl), chromeOptions.ToCapabilities(), TimeSpan.FromSeconds(60));
-                    }
-                    else
-                    {
-                        driver = new ChromeDriver(chromeOptions);
-                    }
-                    break;
+                            driver = new RemoteWebDriver(new Uri(SeleniumHubUrl), chromeOptions);
+                            Console.WriteLine("RemoteWebDriver for Chrome initialized successfully.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error initializing RemoteWebDriver for Chrome: {ex.Message}");
+                            throw;
+                        }
+                        break;
 
-                case "edge":
-                    new DriverManager().SetUpDriver(new EdgeConfig());
-                    var edgeOptions = new EdgeOptions();
-                    edgeOptions.AddArgument("--disable-notifications");
+                    case "edge":
+                        try
+                        {
+                            Console.WriteLine("Setting up RemoteWebDriver for Edge...");
+                            var edgeOptions = new EdgeOptions();
+                            edgeOptions.AddArgument("--disable-notifications");
+                            edgeOptions.AddArgument("--disable-popup-blocking");
+                            edgeOptions.AddArgument("--disable-blink-features=AutomationControlled");
+                            edgeOptions.AddArgument("--headless");
+                            edgeOptions.AddArgument("--no-sandbox");
+                            edgeOptions.AddArgument("--disable-dev-shm-usage");
 
-                    if (isRunningInJenkins)
-                    {
-                        driver = new RemoteWebDriver(new Uri(seleniumHubUrl), edgeOptions.ToCapabilities(), TimeSpan.FromSeconds(60));
-                    }
-                    else
-                    {
-                        driver = new EdgeDriver(edgeOptions);
-                    }
-                    break;
+                            driver = new RemoteWebDriver(new Uri(SeleniumHubUrl), edgeOptions);
+                            Console.WriteLine("RemoteWebDriver for Edge initialized successfully.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error initializing RemoteWebDriver for Edge: {ex.Message}");
+                            throw;
+                        }
+                        break;
 
-                default:
-                    throw new ArgumentException($"Browser '{browserName}' is not supported.");
+                    default:
+                        throw new ArgumentException($"Browser '{browserName}' is not supported.");
+                }
+            }
+            else
+            {
+                switch (browserName.ToLower())
+                {
+                    case "chrome":
+                        try
+                        {
+                            Console.WriteLine("Setting up Chrome driver...");
+                            new DriverManager().SetUpDriver(new ChromeConfig());
+
+                            var chromeOptions = new ChromeOptions();
+                            chromeOptions.AddArgument("--disable-notifications");
+                            chromeOptions.AddUserProfilePreference("credentials_enable_service", false);
+                            chromeOptions.AddUserProfilePreference("profile.password_manager_enabled", false);
+                            chromeOptions.AddArgument("--disable-popup-blocking");
+                            chromeOptions.AddArgument("--disable-infobars");
+                            chromeOptions.AddUserProfilePreference("autofill.profile_enabled", false);
+                            chromeOptions.AddUserProfilePreference("autofill.credit_card_enabled", false);
+                            chromeOptions.AddArgument("--disable-blink-features=AutomationControlled");
+                            chromeOptions.AddExcludedArgument("enable-automation");
+                            chromeOptions.AddAdditionalOption("useAutomationExtension", false);
+                            chromeOptions.AddArgument($"--load-extension={UBlockExtensionChromePath}");
+
+                            driver = new ChromeDriver(chromeOptions);
+                            Console.WriteLine("Chrome driver initialized successfully.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error initializing Chrome driver: {ex.Message}");
+                            throw;
+                        }
+                        break;
+
+                    case "edge":
+                        try
+                        {
+                            Console.WriteLine("Setting up Edge driver...");
+                            new DriverManager().SetUpDriver(new EdgeConfig());
+                            var edgeOptions = new EdgeOptions();
+                            edgeOptions.AddArgument("--disable-notifications");
+                            edgeOptions.AddArgument("--disable-popup-blocking");
+                            edgeOptions.AddArgument("--disable-blink-features=AutomationControlled");
+                            edgeOptions.AddArgument($"--load-extension={UBlockExtensionEdgePath}");
+
+                            driver = new EdgeDriver(edgeOptions);
+                            Console.WriteLine("Edge driver initialized successfully.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error initializing Edge driver: {ex.Message}");
+                            throw;
+                        }
+                        break;
+
+                    default:
+                        throw new ArgumentException($"Browser '{browserName}' is not supported.");
+                }
             }
 
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(ConfigReader.GetImplicitWait());
-            driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(ConfigReader.GetPageLoadTimeout());
-
-            if (ConfigReader.GetWindowSize().ToLower() == "maximize")
+            try
             {
-                driver.Manage().Window.Maximize();
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(ConfigReader.GetImplicitWait());
+                driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(ConfigReader.GetPageLoadTimeout());
+
+                if (ConfigReader.GetWindowSize().ToLower() == "maximize")
+                {
+                    driver.Manage().Window.Maximize();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error configuring driver timeouts or window size: {ex.Message}");
+                driver?.Quit();
+                throw;
             }
 
             return driver;
